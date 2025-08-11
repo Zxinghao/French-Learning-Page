@@ -3,11 +3,12 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>French Daily Reader — Mobile</title>
+<title>French Daily Reader — Mobile/Desktop</title>
 <style>
   :root{
     --ink:#0f172a; --muted:#475569;
     --border:#dfe7ef; --shadow:0 10px 32px rgba(2,6,23,.16);
+    --disabled: #cbd5e1;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
@@ -20,7 +21,7 @@
   /* Calm background canvas */
   #bgCanvas{position:fixed; inset:0; z-index:-2; background:linear-gradient(180deg,#f7fbff,#eef6ff)}
 
-  /* Top bar (safe area aware) */
+  /* Top bar */
   .topbar{
     position:sticky; top:0; z-index:10;
     backdrop-filter:saturate(1.05) blur(10px);
@@ -39,17 +40,21 @@
     border:1px solid var(--border);
     background:rgba(255,255,255,.75);
     color:var(--ink);
-    padding:10px 12px; border-radius:14px; font-weight:600; font-size:16px; /* 16px to avoid iOS zoom */
+    padding:10px 12px; border-radius:14px; font-weight:600; font-size:16px; /* avoid iOS zoom */
     min-height:44px; display:inline-flex; align-items:center; gap:8px; backdrop-filter: blur(6px);
   }
   select{cursor:pointer}
   .btn{
     cursor:pointer; background:rgba(238,242,255,.9);
     transition:transform .05s ease, opacity .2s ease;
-    touch-action: manipulation; /* ensure taps fire immediately on iOS */
+    touch-action: manipulation;
   }
   .btn:active{transform:scale(.98)}
   .btn.primary{background:linear-gradient(90deg,#2563eb,#16a34a); color:white; border:none}
+  .btn[disabled]{
+    opacity:.55; cursor:not-allowed; border-color:var(--disabled); background:rgba(248,250,252,.8); color:var(--muted);
+    pointer-events:none;
+  }
 
   /* Layout */
   .wrap{max-width:900px; margin:12px auto 70px; padding:0 14px}
@@ -58,7 +63,7 @@
     backdrop-filter: blur(10px);
     border:1px solid rgba(231,237,243,.95); border-radius:22px;
     padding:18px 16px; box-shadow:var(--shadow);
-    touch-action: pan-y; /* allow vertical scroll but capture horizontal swipes */
+    touch-action: pan-y;
   }
   h1.title{margin:.2rem 0 .3rem; font-size:1.25rem}
   .meta{display:flex; gap:8px; flex-wrap:wrap; color:var(--muted); font-size:.95rem; margin-bottom:6px}
@@ -77,12 +82,17 @@
     display:flex; align-items:center; justify-content:space-between; gap:8px; margin:10px 0 6px;
   }
   .pager .index{color:var(--muted); font-weight:700}
-  .pager .btn{flex:0 0 auto; min-width:80px; justify-content:center}
+  .pager .btn{flex:0 0 auto; min-width:88px; justify-content:center}
+
+  /* Notices */
+  .notice{
+    margin:10px 0 0; font-size:.95rem; color:#0b3d92;
+    background:rgba(237,244,255,.85); border:1px solid #cfe1ff; padding:8px 10px; border-radius:10px;
+  }
 
   footer{color:var(--muted); text-align:center; margin:14px 0 calc(14px + env(safe-area-inset-bottom)); font-size:.95rem}
   .kbd{font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:.95em; background:rgba(248,250,252,.9); border:1px solid #e2e8f0; padding:2px 6px; border-radius:6px}
 
-  /* Mobile tweaks */
   @media (max-width: 640px){
     .controls{gap:6px}
     .chip{padding:8px 10px; min-height:44px}
@@ -90,11 +100,7 @@
     article{padding:16px 14px}
     h1.title{font-size:1.15rem}
   }
-
-  /* Reduce animation if user prefers */
-  @media (prefers-reduced-motion: reduce){
-    #bgCanvas{display:none}
-  }
+  @media (prefers-reduced-motion: reduce){ #bgCanvas{display:none} }
 </style>
 </head>
 <body>
@@ -131,9 +137,9 @@
     <h1 class="title" id="title"></h1>
 
     <div class="pager">
-      <button class="btn" id="prev" type="button">← Prev</button>
+      <button class="btn" id="prev" type="button" aria-label="Previous article">← Prev</button>
       <div class="index" id="idx">1 / 1</div>
-      <button class="btn" id="next" type="button">Next →</button>
+      <button class="btn" id="next" type="button" aria-label="Next article">Next →</button>
     </div>
 
     <div class="content" id="content"></div>
@@ -150,6 +156,7 @@
     </details>
 
     <p class="muted" id="subtitle"></p>
+    <div id="notice" class="notice" style="display:none"></div>
   </article>
 
   <footer id="dateInfo">
@@ -158,12 +165,12 @@
 </div>
 
 <script>
-/* ===== A) Ultra-calm background optimized for iPhone ===== */
+/* Calm background (slow ribbons) */
 (function(){
   const c = document.getElementById('bgCanvas');
   const ctx = c.getContext('2d', {alpha:true});
-  let W=0, H=0, t=0, raf, mobile = /iPhone|Android/i.test(navigator.userAgent);
-
+  let W=0, H=0, t=0;
+  const mobile = /iPhone|Android/i.test(navigator.userAgent);
   const ribbons = (mobile ? [
     {amp: 26, freq: 0.0012, speed: 0.00018, hue: 210, alpha: 0.10},
     {amp: 36, freq: 0.0009, speed: 0.00014, hue: 190, alpha: 0.09}
@@ -172,7 +179,6 @@
     {amp: 36, freq: 0.0012, speed: 0.00024, hue: 190, alpha: 0.09},
     {amp: 44, freq: 0.0010, speed: 0.00020, hue: 230, alpha: 0.09}
   ]);
-
   function sizeToViewport(){
     const dpr = Math.min(window.devicePixelRatio||1, mobile ? 1.5 : 2);
     const vw = window.innerWidth;
@@ -189,13 +195,11 @@
     visualViewport.addEventListener('resize', sizeToViewport, {passive:true});
     visualViewport.addEventListener('scroll', sizeToViewport, {passive:true});
   }
-
   function drawRibbon(r, phase){
     const grad = ctx.createLinearGradient(0,0,0,H);
     grad.addColorStop(0, `hsla(${r.hue}, 80%, 90%, ${r.alpha})`);
     grad.addColorStop(1, `hsla(${(r.hue+40)%360}, 90%, 80%, ${r.alpha})`);
     ctx.fillStyle = grad;
-
     ctx.beginPath();
     const yBase = H*0.35 + Math.sin(t*r.speed + phase)*18;
     ctx.moveTo(0, yBase);
@@ -207,12 +211,8 @@
         + Math.cos( (x*r.freq*0.6) - t*r.speed*0.7 + phase*0.7 ) * (r.amp*0.33);
       ctx.lineTo(x, y);
     }
-    ctx.lineTo(c.clientWidth, H);
-    ctx.lineTo(0, H);
-    ctx.closePath();
-    ctx.fill();
+    ctx.lineTo(c.clientWidth, H); ctx.lineTo(0, H); ctx.closePath(); ctx.fill();
   }
-
   function frame(){
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     t += 1;
@@ -220,14 +220,14 @@
     g.addColorStop(0, '#f7fbff'); g.addColorStop(1, '#eef6ff');
     ctx.fillStyle = g; ctx.fillRect(0,0,c.clientWidth,H);
     ribbons.forEach((r,i)=> drawRibbon(r, i*1.05));
-    raf = requestAnimationFrame(frame);
+    requestAnimationFrame(frame);
   }
   frame();
 })();
 </script>
 
 <script>
-/* ===== B) Default articles (fallback if JSON isn't found) ===== */
+/* Built-in fallback articles (A2/B1/B2) — ensures Prev/Next work even without JSON */
 var DEFAULT_ARTICLES = [
   {
     id:"a2_routine_long", level:"A2",
@@ -245,15 +245,56 @@ var DEFAULT_ARTICLES = [
     ],
     vocab:[["se réveiller doucement","to wake up gently"],["aérer la chambre","to air the room"],["lancer une tâche","to start a task"],["du bon pied","on the right foot"]],
     grammar:[
-      {point:"Présent de l’habitude + adverbes d’ordre", fr:"Présent pour les routines (« je me lève », « je prends »). Adverbes: ensuite, puis, quand. « Quand » peut exprimer une habitude au présent.", en:"Present for routines; order adverbs; 'quand' can be habitual."},
-      {point:"Si + présent (condition réelle)", fr:"Conséquence stable: « S’il pleut, je prends le bus. » Présent dans les deux propositions.", en:"Real condition uses present both sides."},
-      {point:"Infinitif prépositionnel", fr:"« avant de + inf. » antériorité; « pour + inf. » but.", en:"'avant de' (before), 'pour' (purpose)."}
+      {point:"Présent de l’habitude + adverbes d’ordre", fr:"Présent pour les routines (« je me lève », « je prends »). Adverbes: ensuite, puis, quand.", en:"Present for routines; order adverbs."},
+      {point:"Si + présent (condition réelle)", fr:"« S’il pleut, je prends le bus. » Présent des deux côtés.", en:"Real condition uses present both sides."},
+      {point:"Infinitif prépositionnel", fr:"« avant de » / « pour » + infinitif.", en:"'avant de' (before); 'pour' (purpose)."}
+    ]
+  },
+  {
+    id:"b1_project_long", level:"B1",
+    title:"Organiser un projet personnel sur un mois",
+    title_en:"Organizing a personal project over a month",
+    body:[
+`Au début, je définis un objectif clair et mesurable…`,
+`Je tiens un carnet de bord où je note les obstacles rencontrés et les solutions testées…`,
+`À la fin de chaque semaine, je fais un bilan rapide…`
+    ],
+    body_en:[
+`At the start, I define a clear, measurable goal…`,
+`I keep a logbook where I note obstacles and tested solutions…`,
+`At the end of each week, I do a quick review…`
+    ],
+    vocab:[["un carnet de bord","logbook"],["un créneau","time slot"],["réduire le périmètre","reduce scope"]],
+    grammar:[
+      {point:"Infinitif de but", fr:"« pour + inf. », « afin de + inf. »", en:"Purpose infinitive."},
+      {point:"Relatives", fr:"qui/que/où/dont + accord du participe passé avec COD antéposé.", en:"Relative pronouns; past participle agreement."},
+      {point:"Concession", fr:"« même si » + ind.; « bien que » + subj.", en:"Concession forms."}
+    ]
+  },
+  {
+    id:"b2_media_long", level:"B2",
+    title:"Lire l’actualité avec méthode et distance critique",
+    title_en:"Reading the news methodically and critically",
+    body:[
+`Face au flux continu d’informations…`,
+`Je prête attention au vocabulaire…`,
+`Enfin, je garde une distance émotionnelle…`
+    ],
+    body_en:[
+`Faced with a continuous flow of information…`,
+`I pay attention to wording…`,
+`Finally, I keep emotional distance…`
+    ],
+    vocab:[["positionnement éditorial","editorial stance"],["échantillon","sample"],["titre sensationnaliste","sensational headline"]],
+    grammar:[
+      {point:"Impersonnels", fr:"« Il est probable que… » / « Il est possible que… »", en:"Impersonal probability."},
+      {point:"Subordonnées", fr:"Temps, but, opposition (« bien que » + subj.)", en:"Temporal/purpose/concession."},
+      {point:"Nominalisations", fr:"Structurent l’argumentation.", en:"Nominalizations for structure."}
     ]
   }
-  /* (You can keep only A2 here; your articles.json will override) */
 ];
 
-/* ===== C) JSON loader (articles.json) ===== */
+/* JSON loader (overrides defaults if present) */
 let ARTICLES = DEFAULT_ARTICLES;
 async function loadArticlesJSON(){
   try{
@@ -261,12 +302,10 @@ async function loadArticlesJSON(){
     if(!res.ok) throw 0;
     const json = await res.json();
     if(Array.isArray(json) && json.length) ARTICLES = json;
-  }catch(e){
-    // keep DEFAULT_ARTICLES
-  }
+  }catch(e){ /* keep defaults */ }
 }
 
-/* ===== D) Utilities ===== */
+/* Utilities */
 function getParisDateKey(){
   const fmt = new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit'});
   return fmt.format(new Date());
@@ -282,7 +321,7 @@ function pickStable(arr, n, seed){
 function countWords(frParas){ return frParas.join(' ').trim().split(/\s+/).filter(Boolean).length; }
 function readTime(words){ const min = Math.max(1, Math.round(words/180)); return min + " min"; }
 
-/* ===== E) DOM ===== */
+/* DOM */
 const titleEl = document.getElementById('title');
 const subEl   = document.getElementById('subtitle');
 const metaEl  = document.getElementById('meta');
@@ -302,34 +341,52 @@ const btnStop = document.getElementById('stop');
 const btnReroll = document.getElementById('reroll');
 const dateInfoEl = document.getElementById('dateInfo');
 const card = document.getElementById('card');
+const notice = document.getElementById('notice');
 
-/* ===== F) State & selection ===== */
+/* State */
 let voices = [];
 let currentSet = [];
 let currentIndex = 0;
 let rerollSalt = 0;
 
+/* Nav state helper */
+function updateNav(){
+  const n = currentSet.length;
+  idxEl.textContent = `${Math.min(currentIndex+1,n)} / ${n||1}`;
+  btnPrev.disabled = !(n>1 && currentIndex>0);
+  btnNext.disabled = !(n>1 && currentIndex<n-1);
+
+  if (n <= 1){
+    let reason = 'Only one article available.';
+    const lvl = levelSelect.value;
+    const pool = byLevel(lvl);
+    if (pool.length <= 1) reason = `Only ${pool.length} article found for level “${lvl}”. Add more items to articles.json or switch Level to Mix.`;
+    notice.style.display = 'block';
+    notice.textContent = reason;
+  } else {
+    notice.style.display = 'none';
+    notice.textContent = '';
+  }
+}
+
+/* Render */
+function renderCurrent(){
+  const a = currentSet[currentIndex]; if(!a){ contentEl.innerHTML=''; updateNav(); return; }
+  const words = countWords(a.body||[]);
+  metaEl.innerHTML = `<span class="tag">Level: ${a.level||'—'}</span><span class="tag">${words} words • ~${readTime(words)}</span>`;
+  titleEl.textContent = a.title||'';
+  subEl.innerHTML = a.title_en ? `<em>${a.title_en}</em>` : '';
+  contentEl.innerHTML = (a.body||[]).map((p,i)=>`<p>${p}</p><p class="en">${a.body_en?.[i]||''}</p>`).join('');
+  vocabEl.innerHTML = (a.vocab||[]).map(v=>`<li><strong>${v[0]}</strong> — <span class="muted">${v[1]}</span></li>`).join('');
+  gramEl.innerHTML  = (a.grammar||[]).map(g=>`<li><strong>${g.point}.</strong> ${g.fr} <span class="muted">(${g.en})</span></li>`).join('');
+  document.querySelectorAll('.en').forEach(n=> n.style.display = showEn.checked ? 'block' : 'none');
+  updateNav();
+}
+
+/* Selection */
 function updateDateInfo(){
   const key = getParisDateKey();
   dateInfoEl.innerHTML = 'Today (Europe/Paris): ' + key + ' • Swipe on the card to switch';
-}
-function renderCurrent(){
-  const a = currentSet[currentIndex]; if(!a) return;
-  const words = countWords(a.body);
-  metaEl.innerHTML = `<span class="tag">Level: ${a.level}</span><span class="tag">${words} words • ~${readTime(words)}</span>`;
-  titleEl.textContent = a.title;
-  subEl.innerHTML = a.title_en ? `<em>${a.title_en}</em>` : '';
-  contentEl.innerHTML = a.body.map((p,i)=>`<p>${p}</p><p class="en">${a.body_en?.[i]||''}</p>`).join('');
-  vocabEl.innerHTML = (a.vocab||[]).map(v=>`<li><strong>${v[0]}</strong> — <span class="muted">${v[1]}</span></li>`).join('');
-  gramEl.innerHTML  = (a.grammar||[]).map(g=>`<li><strong>${g.point}.</strong> ${g.fr} <span class="muted">(${g.en})</span></li>`).join('');
-  idxEl.textContent = `${currentIndex+1} / ${currentSet.length}`;
-  document.querySelectorAll('.en').forEach(n=> n.style.display = showEn.checked ? 'block' : 'none');
-
-  // Auto-collapse grammar/vocab on small screens for less clutter
-  if (window.innerWidth <= 640) {
-    document.getElementById('grammarBox').open = false;
-    document.getElementById('vocabBox').open = false;
-  }
 }
 function computeTodaySet(){
   const key = getParisDateKey();
@@ -343,7 +400,7 @@ function computeTodaySet(){
   renderCurrent();
 }
 
-/* ===== G) Audio (TTS) ===== */
+/* Audio (TTS) */
 function loadVoices(){
   const all = window.speechSynthesis.getVoices();
   voices = all.filter(v=> /^fr(-|_|$)/i.test(v.lang) || /French/i.test(v.name));
@@ -360,7 +417,7 @@ function speakCurrent(){
   const a = currentSet[currentIndex]; if(!a) return;
   const rate = slow.checked ? 0.85 : 1.0;
   const chosen = voices[voiceSel.selectedIndex] || voices[0];
-  a.body.forEach(txt=>{
+  (a.body||[]).forEach(txt=>{
     const u = new SpeechSynthesisUtterance(txt);
     if(chosen) u.voice = chosen;
     u.lang = (chosen && chosen.lang) || 'fr-FR';
@@ -375,7 +432,7 @@ function togglePlay(){
   else { speakCurrent(); }
 }
 
-/* ===== H) Events ===== */
+/* Events */
 showEn.addEventListener('change', ()=> document.querySelectorAll('.en').forEach(n=> n.style.display = showEn.checked ? 'block' : 'none'));
 [levelSelect, countSelect].forEach(sel=> sel.addEventListener('change', computeTodaySet));
 btnPrev.addEventListener('click', ()=>{ if(currentIndex>0){ currentIndex--; renderCurrent(); } });
@@ -391,49 +448,26 @@ window.addEventListener('keydown', (e)=>{
   if(e.code==='Space'){ e.preventDefault(); togglePlay(); }
 });
 
-/* ===== I) Swipe left/right on the card (safe with buttons) ===== */
+/* Swipe left/right on the card (ignores controls) */
 (function(){
   let x0=null, y0=null, t0=0, startTarget=null;
-
-  function isControl(el){
-    return el && el.closest('.btn, button, select, option, summary, details, a, input, textarea, label');
-  }
-
-  card.addEventListener('touchstart', (e)=>{
-    const t = e.changedTouches[0];
-    x0 = t.clientX; y0 = t.clientY; t0 = Date.now();
-    startTarget = e.target;
-  }, {passive:true});
-
+  function isControl(el){ return el && el.closest('.btn, button, select, option, summary, details, a, input, textarea, label'); }
+  card.addEventListener('touchstart', (e)=>{ const t=e.changedTouches[0]; x0=t.clientX; y0=t.clientY; t0=Date.now(); startTarget=e.target; }, {passive:true});
   card.addEventListener('touchend', (e)=>{
     if (x0==null) return;
-    const t = e.changedTouches[0];
-    const dx = t.clientX - x0;
-    const dy = t.clientY - y0;
-    const dt = Date.now() - t0;
-
-    // reset for next gesture
-    x0 = y0 = null;
-
-    // If the touch began on a control, don't treat it as a swipe
-    if (isControl(startTarget)) { startTarget = null; return; }
-    startTarget = null;
-
-    // Only treat as swipe if it’s a quick, mostly-horizontal gesture
-    if (Math.abs(dx) > 60 && Math.abs(dy) < 40 && dt < 600){
-      if (dx < 0 && currentIndex < currentSet.length-1) { currentIndex++; renderCurrent(); }
-      else if (dx > 0 && currentIndex > 0) { currentIndex--; renderCurrent(); }
+    const t=e.changedTouches[0]; const dx=t.clientX-x0; const dy=t.clientY-y0; const dt=Date.now()-t0;
+    x0=y0=null; if (isControl(startTarget)) { startTarget=null; return; } startTarget=null;
+    if (Math.abs(dx)>60 && Math.abs(dy)<40 && dt<600){
+      if (dx<0 && currentIndex<currentSet.length-1){ currentIndex++; renderCurrent(); }
+      else if (dx>0 && currentIndex>0){ currentIndex--; renderCurrent(); }
     }
   }, {passive:true});
-
-  // Extra safety: stop click bubbling from buttons so swipe handler never interferes
   ['prev','next','play','stop','reroll'].forEach(id=>{
-    const el = document.getElementById(id);
-    if (el) el.addEventListener('click', (e)=> e.stopPropagation());
+    const el=document.getElementById(id); if(el) el.addEventListener('click', (e)=> e.stopPropagation());
   });
 })();
 
-/* ===== J) Init ===== */
+/* Init */
 (async function init(){
   await loadArticlesJSON();
   loadVoices();
