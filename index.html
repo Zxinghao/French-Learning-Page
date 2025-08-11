@@ -8,7 +8,7 @@
   :root{
     --ink:#0f172a; --muted:#475569;
     --border:#dfe7ef; --shadow:0 10px 32px rgba(2,6,23,.16);
-    --disabled: #cbd5e1;
+    --disabled:#cbd5e1;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
@@ -63,7 +63,7 @@
     backdrop-filter: blur(10px);
     border:1px solid rgba(231,237,243,.95); border-radius:22px;
     padding:18px 16px; box-shadow:var(--shadow);
-    touch-action: pan-y;
+    touch-action: pan-y; /* allow vertical scroll but capture horizontal swipes */
   }
   h1.title{margin:.2rem 0 .3rem; font-size:1.25rem}
   .meta{display:flex; gap:8px; flex-wrap:wrap; color:var(--muted); font-size:.95rem; margin-bottom:6px}
@@ -165,7 +165,7 @@
 </div>
 
 <script>
-/* Calm background (slow ribbons) */
+/* ===== A) Calm background (slow aurora ribbons) ===== */
 (function(){
   const c = document.getElementById('bgCanvas');
   const ctx = c.getContext('2d', {alpha:true});
@@ -227,21 +227,21 @@
 </script>
 
 <script>
-/* Built-in fallback articles (A2/B1/B2) — ensures Prev/Next work even without JSON */
+/* ===== B) Built-in fallback articles (A2/B1/B2) ===== */
 var DEFAULT_ARTICLES = [
   {
     id:"a2_routine_long", level:"A2",
     title:"Ma routine du matin, simple mais efficace",
     title_en:"My morning routine, simple but effective",
     body:[
-`Je me lève vers sept heures et demie, parfois un peu plus tôt quand j’ai une réunion importante. Avant d’allumer mon téléphone, je bois un grand verre d’eau pour me réveiller doucement. Ensuite, je prends une douche rapide et je m’habille avec des vêtements préparés la veille pour gagner du temps. J’ouvre la fenêtre quelques minutes pour aérer la chambre et je fais mon lit. Ces petits gestes me donnent l’impression de commencer la journée du bon pied.`,
-`Dans la cuisine, je prépare un petit-déjeuner simple : un café, un fruit et des tartines avec un peu de beurre et de confiture. Pendant que le café coule, je regarde brièvement mes messages et mon agenda. Je note deux ou trois priorités pour la journée afin de rester concentré. J’essaie d’éviter les réseaux sociaux le matin, parce qu’ils me font perdre du temps sans que je m’en rende compte.`,
-`Quand il fait beau, je vais au travail à vélo : l’air frais me réveille et me met de bonne humeur. S’il pleut, je prends le bus et j’écoute un podcast en français pour pratiquer la langue. J’arrive généralement au bureau vers neuf heures moins le quart. Avant de commencer, je range mon bureau, je ferme les onglets inutiles sur l’ordinateur et je lance une première tâche courte ; cela m’aide à me mettre en mouvement sans stress. Grâce à cette routine, mes matinées sont plus calmes et productives.`
+"Je me lève vers sept heures et demie, parfois un peu plus tôt quand j’ai une réunion importante. Avant d’allumer mon téléphone, je bois un grand verre d’eau pour me réveiller doucement. Ensuite, je prends une douche rapide et je m’habille avec des vêtements préparés la veille pour gagner du temps. J’ouvre la fenêtre quelques minutes pour aérer la chambre et je fais mon lit. Ces petits gestes me donnent l’impression de commencer la journée du bon pied.",
+"Dans la cuisine, je prépare un petit-déjeuner simple : un café, un fruit et des tartines avec un peu de beurre et de confiture. Pendant que le café coule, je regarde brièvement mes messages et mon agenda. Je note deux ou trois priorités pour la journée afin de rester concentré. J’essaie d’éviter les réseaux sociaux le matin, parce qu’ils me font perdre du temps sans que je m’en rende compte.",
+"Quand il fait beau, je vais au travail à vélo : l’air frais me réveille et me met de bonne humeur. S’il pleut, je prends le bus et j’écoute un podcast en français pour pratiquer la langue. J’arrive généralement au bureau vers neuf heures moins le quart. Avant de commencer, je range mon bureau, je ferme les onglets inutiles sur l’ordinateur et je lance une première tâche courte ; cela m’aide à me mettre en mouvement sans stress. Grâce à cette routine, mes matinées sont plus calmes et productives."
     ],
     body_en:[
-`I get up around seven thirty, sometimes a little earlier when I have an important meeting. Before turning on my phone, I drink a big glass of water to wake up gently. Then I take a quick shower and put on clothes prepared the night before to save time. I open the window for a few minutes to air the room and make my bed. These small actions make me feel like I’m starting the day on the right foot.`,
-`In the kitchen, I prepare a simple breakfast: coffee, a piece of fruit, and toast with a bit of butter and jam. While the coffee brews, I briefly check my messages and my calendar. I jot down two or three priorities for the day to stay focused. I try to avoid social media in the morning because it makes me waste time without realizing it.`,
-`When the weather is nice, I go to work by bike: the fresh air wakes me up and puts me in a good mood. If it’s raining, I take the bus and listen to a podcast in French to practice. I usually arrive at the office around quarter to nine. Before starting, I tidy my desk, close unnecessary tabs on the computer, and launch a short first task; that helps me get moving without stress. Thanks to this routine, my mornings are calmer and more productive.`
+"I get up around seven thirty, sometimes a little earlier when I have an important meeting. Before turning on my phone, I drink a big glass of water to wake up gently. Then I take a quick shower and put on clothes prepared the night before to save time. I open the window for a few minutes to air the room and make my bed. These small actions make me feel like I’m starting the day on the right foot.",
+"In the kitchen, I prepare a simple breakfast: coffee, a piece of fruit, and toast with a bit of butter and jam. While the coffee brews, I briefly check my messages and my calendar. I jot down two or three priorities for the day to stay focused. I try to avoid social media in the morning because it makes me waste time without realizing it.",
+"When the weather is nice, I go to work by bike: the fresh air wakes me up and puts me in a good mood. If it’s raining, I take the bus and listen to a podcast in French to practice. I usually arrive at the office around quarter to nine. Before starting, I tidy my desk, close unnecessary tabs on the computer, and launch a short first task; that helps me get moving without stress. Thanks to this routine, my mornings are calmer and more productive."
     ],
     vocab:[["se réveiller doucement","to wake up gently"],["aérer la chambre","to air the room"],["lancer une tâche","to start a task"],["du bon pied","on the right foot"]],
     grammar:[
@@ -255,20 +255,20 @@ var DEFAULT_ARTICLES = [
     title:"Organiser un projet personnel sur un mois",
     title_en:"Organizing a personal project over a month",
     body:[
-`Au début, je définis un objectif clair et mesurable…`,
-`Je tiens un carnet de bord où je note les obstacles rencontrés et les solutions testées…`,
-`À la fin de chaque semaine, je fais un bilan rapide…`
+"Au début, je définis un objectif clair et mesurable. Par exemple : « terminer une courte histoire de deux mille mots » ou « réaliser une vidéo de cinq minutes ». Ensuite, je découpe l’objectif en petites étapes concrètes : trouver l’idée, faire un plan simple, produire une première version, relire ou monter, puis publier. Je réserve des créneaux fixes trois ou quatre fois par semaine, d’environ quarante-cinq minutes, et j’éteins les notifications pendant ce temps pour rester concentré.",
+"Je tiens un carnet de bord où je note les obstacles rencontrés et les solutions testées. Cela m’aide à comprendre ce qui fonctionne pour moi. Par exemple, je constate que je travaille mieux le matin, après un café, et que j’avance davantage quand je commence par une mini-tâche très facile. Je me fixe aussi des limites : pas plus d’une heure de recherche d’inspiration, pour éviter de me perdre sur Internet. Enfin, je demande un retour à un ami une fois par semaine, afin d’avoir un regard extérieur et des suggestions concrètes.",
+"À la fin de chaque semaine, je fais un bilan rapide : ce que j’ai accompli, ce qui a bloqué, ce que je vais essayer ensuite. Si je prends du retard, je réduis le périmètre au lieu d’abandonner : une histoire plus courte, une vidéo plus simple. Le but est de terminer quelque chose de présentable. En un mois, je progresse non seulement sur le contenu, mais aussi sur la méthode : j’apprends à mieux planifier, à évaluer mon temps et à garder la motivation sans pression excessive."
     ],
     body_en:[
-`At the start, I define a clear, measurable goal…`,
-`I keep a logbook where I note obstacles and tested solutions…`,
-`At the end of each week, I do a quick review…`
+"At the start, I define a clear, measurable goal: “finish a short story of two thousand words” or “make a five-minute video.” Then I break it into concrete steps: find the idea, outline, produce a first version, revise or edit, then publish. I block fixed slots three or four times a week for about forty-five minutes and turn off notifications to stay focused.",
+"I keep a logbook where I note obstacles and tested solutions. It helps me see what works for me. For example, I notice I work better in the morning after coffee, and I make more progress when I begin with a very easy mini-task. I also set limits: no more than one hour of inspiration research, to avoid getting lost online. Finally, I ask a friend for feedback once a week to get an outside view and concrete suggestions.",
+"At the end of each week, I do a quick review: what I accomplished, what blocked me, what I’ll try next. If I fall behind, I reduce scope instead of giving up: a shorter story, a simpler video. The aim is to finish something presentable. In a month, I progress not only on the content but also on the method: I learn to plan better, estimate my time, and keep motivation without excessive pressure."
     ],
-    vocab:[["un carnet de bord","logbook"],["un créneau","time slot"],["réduire le périmètre","reduce scope"]],
+    vocab:[["un carnet de bord","logbook / progress journal"],["un créneau","time slot"],["réduire le périmètre","reduce scope"]],
     grammar:[
-      {point:"Infinitif de but", fr:"« pour + inf. », « afin de + inf. »", en:"Purpose infinitive."},
-      {point:"Relatives", fr:"qui/que/où/dont + accord du participe passé avec COD antéposé.", en:"Relative pronouns; past participle agreement."},
-      {point:"Concession", fr:"« même si » + ind.; « bien que » + subj.", en:"Concession forms."}
+      {point:"Infinitif de but / restriction", fr:"« pour + inf. » exprime le but. « afin de »: registre plus formel. « pour éviter de + inf. » marque la restriction.", en:"Purpose with 'pour/afin de'; restriction with 'pour éviter de'."},
+      {point:"Relatives (qui/que/où/dont) + accords", fr:"Accord du participe passé avec COD antéposé : « les solutions que j’ai testées ». ", en:"Relative pronouns; past participle agreement."},
+      {point:"Concession (même si / bien que)", fr:"« même si » + indicatif ; « bien que » + subjonctif.", en:"'même si' + indicative; 'bien que' + subjunctive."}
     ]
   },
   {
@@ -276,36 +276,105 @@ var DEFAULT_ARTICLES = [
     title:"Lire l’actualité avec méthode et distance critique",
     title_en:"Reading the news methodically and critically",
     body:[
-`Face au flux continu d’informations…`,
-`Je prête attention au vocabulaire…`,
-`Enfin, je garde une distance émotionnelle…`
+"Face au flux continu d’informations, je commence par vérifier la nature de la source : média reconnu, blog personnel, réseau social ? Je regarde la date de publication et, si possible, la date des faits. Lorsque le titre est très alarmant, je lis l’article en entier pour repérer les nuances, les limites de l’étude citée et les éventuelles contradictions. Ensuite, je cherche un deuxième article, idéalement d’un média au positionnement éditorial différent, pour comparer les angles.",
+"Je prête attention au vocabulaire : mots évaluatifs (« catastrophique », « honteux ») ou formulations prudentes (« il est probable que », « les données suggèrent que »). Les chiffres demandent toujours du contexte : l’échantillon, la période, la méthodologie. Lorsqu’un graphique est présenté, je vérifie l’axe, l’unité et l’échelle. Si une citation circule sur les réseaux, j’essaie d’en retrouver la source complète, car les extraits très courts simplifient souvent à l’excès.",
+"Enfin, je garde une distance émotionnelle : si une nouvelle me met en colère, j’attends quelques minutes avant de partager. Je me demande : « Quel est l’objectif de cette publication ? Informer, convaincre, vendre ? » Pour rester équilibré, j’ajoute à mon fil des médias internationaux et des médias locaux spécialisés. Avec cette méthode, je lis moins d’articles, mais je les comprends mieux, et je résiste davantage aux interprétations rapides et aux titres sensationnalistes."
     ],
     body_en:[
-`Faced with a continuous flow of information…`,
-`I pay attention to wording…`,
-`Finally, I keep emotional distance…`
+"Faced with a continuous flow of information, I first check the type of source: established outlet, personal blog, social network? I look at the publication date and, if possible, the date of the events. When the headline is very alarming, I read the entire article to spot nuance, limits of any cited study, and possible contradictions. Then I look for a second article—ideally from a publication with a different editorial stance—to compare angles.",
+"I pay attention to wording: evaluative terms (“catastrophic,” “shameful”) vs. cautious formulations (“it is likely that,” “the data suggest that”). Numbers always need context: sample, period, methodology. If a chart is shown, I check the axis, unit, and scale. If a quote circulates on social media, I try to find the full source, because short snippets often oversimplify.",
+"Finally, I keep emotional distance: if news makes me angry, I wait a few minutes before sharing. I ask myself: “What is the goal of this publication? Inform, persuade, sell?” To stay balanced, I add both international outlets and specialized local media to my feed. With this method, I read fewer pieces but understand them better, and I resist snap interpretations and sensational headlines."
     ],
-    vocab:[["positionnement éditorial","editorial stance"],["échantillon","sample"],["titre sensationnaliste","sensational headline"]],
+    vocab:[["positionnement éditorial","editorial stance"],["échantillon","sample (statistics)"],["titre sensationnaliste","sensational headline"]],
     grammar:[
-      {point:"Impersonnels", fr:"« Il est probable que… » / « Il est possible que… »", en:"Impersonal probability."},
-      {point:"Subordonnées", fr:"Temps, but, opposition (« bien que » + subj.)", en:"Temporal/purpose/concession."},
-      {point:"Nominalisations", fr:"Structurent l’argumentation.", en:"Nominalizations for structure."}
+      {point:"Impersonnels de probabilité", fr:"« Il est probable que… » / « Il est possible que… » (souvent + subjonctif).", en:"Probability expressions; often subjunctive with uncertainty."},
+      {point:"Subordonnées circonstancielles", fr:"Temps (« lorsque »), but (« pour »), opposition (« bien que » + subj.).", en:"Temporal, purpose, concession."},
+      {point:"Nominalisations", fr:"« publication », « interprétation », « méthodologie » structurent l’argumentation.", en:"Nominalizations help structure."}
     ]
   }
 ];
+</script>
 
-/* JSON loader (overrides defaults if present) */
+<script>
+/* ===== C) JSON loader (articles.json) with validation & notices ===== */
 let ARTICLES = DEFAULT_ARTICLES;
-async function loadArticlesJSON(){
-  try{
-    const res = await fetch('./articles.json', {cache:'no-store'});
-    if(!res.ok) throw 0;
-    const json = await res.json();
-    if(Array.isArray(json) && json.length) ARTICLES = json;
-  }catch(e){ /* keep defaults */ }
+
+/* Notice helper */
+function showNotice(msg){
+  const n = document.getElementById('notice');
+  if (!n) return;
+  n.style.display = 'block';
+  n.textContent = msg;
 }
 
-/* Utilities */
+/* Normalizer accepts common alias keys and pads translations */
+function normalizeArticle(a){
+  const body = Array.isArray(a.body) ? a.body
+             : Array.isArray(a.content) ? a.content
+             : (typeof a.body === 'string' ? [a.body] : []);
+
+  const body_en = Array.isArray(a.body_en) ? a.body_en
+                : Array.isArray(a.translation) ? a.translation
+                : [];
+
+  const vocab = Array.isArray(a.vocab) ? a.vocab
+               : Array.isArray(a.vocabulary) ? a.vocabulary
+               : [];
+
+  const grammar = Array.isArray(a.grammar) ? a.grammar
+                 : Array.isArray(a.grammar_points) ? a.grammar_points
+                 : [];
+
+  // pad/trim body_en to match body length
+  const be = body_en.slice(0, body.length);
+  while (be.length < body.length) be.push('');
+
+  return {
+    id: a.id || cryptoRandomId(),
+    level: (a.level || '').toUpperCase(),
+    title: a.title || '',
+    title_en: a.title_en || a.subtitle_en || '',
+    body, body_en: be,
+    vocab, grammar
+  };
+}
+function isValidArticle(a){
+  if (!a.title || !Array.isArray(a.body) || a.body.length === 0) return false;
+  if (!['A2','B1','B2'].includes(a.level)) return false;
+  return true;
+}
+function cryptoRandomId(){
+  try { return 'id_' + crypto.getRandomValues(new Uint32Array(1))[0].toString(36); }
+  catch(e){ return 'id_' + Math.random().toString(36).slice(2); }
+}
+
+async function loadArticlesJSON(){
+  try{
+    // Daily cache-bust (Paris) so iPhone Safari picks up changes
+    const dailyKey = new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+    const res = await fetch('./articles.json?v='+encodeURIComponent(dailyKey), {cache:'no-store'});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const raw = await res.json();
+    if(!Array.isArray(raw) || raw.length===0) throw new Error('JSON is empty or not an array.');
+
+    const normalized = raw.map(normalizeArticle);
+    const valid = normalized.filter(isValidArticle);
+    const skipped = normalized.length - valid.length;
+
+    if (valid.length > 0) {
+      ARTICLES = valid;
+      if (skipped > 0) showNotice(`${skipped} invalid article(s) in articles.json were skipped. Check keys & levels.`);
+    } else {
+      showNotice(`All items in articles.json were invalid. Using built-in articles. Expected keys: level(A2/B1/B2), title, body[].`);
+    }
+  }catch(err){
+    showNotice(`Couldn’t load articles.json (${err.message || 'load error'}). Using built-in articles.`);
+  }
+}
+</script>
+
+<script>
+/* ===== D) Utilities ===== */
 function getParisDateKey(){
   const fmt = new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit'});
   return fmt.format(new Date());
@@ -318,10 +387,12 @@ function pickStable(arr, n, seed){
   for(let i=idx.length-1;i>0;i--){const j=Math.floor(rng()*(i+1)); [idx[i],idx[j]]=[idx[j],idx[i]];}
   return idx.slice(0, Math.min(n, idx.length)).map(i=>arr[i]);
 }
-function countWords(frParas){ return frParas.join(' ').trim().split(/\s+/).filter(Boolean).length; }
+function countWords(frParas){ return (frParas||[]).join(' ').trim().split(/\s+/).filter(Boolean).length; }
 function readTime(words){ const min = Math.max(1, Math.round(words/180)); return min + " min"; }
+</script>
 
-/* DOM */
+<script>
+/* ===== E) DOM refs ===== */
 const titleEl = document.getElementById('title');
 const subEl   = document.getElementById('subtitle');
 const metaEl  = document.getElementById('meta');
@@ -343,13 +414,13 @@ const dateInfoEl = document.getElementById('dateInfo');
 const card = document.getElementById('card');
 const notice = document.getElementById('notice');
 
-/* State */
+/* ===== F) State ===== */
 let voices = [];
 let currentSet = [];
 let currentIndex = 0;
 let rerollSalt = 0;
 
-/* Nav state helper */
+/* ===== G) Nav helpers ===== */
 function updateNav(){
   const n = currentSet.length;
   idxEl.textContent = `${Math.min(currentIndex+1,n)} / ${n||1}`;
@@ -369,10 +440,10 @@ function updateNav(){
   }
 }
 
-/* Render */
+/* ===== H) Render & selection ===== */
 function renderCurrent(){
   const a = currentSet[currentIndex]; if(!a){ contentEl.innerHTML=''; updateNav(); return; }
-  const words = countWords(a.body||[]);
+  const words = countWords(a.body);
   metaEl.innerHTML = `<span class="tag">Level: ${a.level||'—'}</span><span class="tag">${words} words • ~${readTime(words)}</span>`;
   titleEl.textContent = a.title||'';
   subEl.innerHTML = a.title_en ? `<em>${a.title_en}</em>` : '';
@@ -382,8 +453,6 @@ function renderCurrent(){
   document.querySelectorAll('.en').forEach(n=> n.style.display = showEn.checked ? 'block' : 'none');
   updateNav();
 }
-
-/* Selection */
 function updateDateInfo(){
   const key = getParisDateKey();
   dateInfoEl.innerHTML = 'Today (Europe/Paris): ' + key + ' • Swipe on the card to switch';
@@ -400,7 +469,7 @@ function computeTodaySet(){
   renderCurrent();
 }
 
-/* Audio (TTS) */
+/* ===== I) Audio (TTS) ===== */
 function loadVoices(){
   const all = window.speechSynthesis.getVoices();
   voices = all.filter(v=> /^fr(-|_|$)/i.test(v.lang) || /French/i.test(v.name));
@@ -432,7 +501,7 @@ function togglePlay(){
   else { speakCurrent(); }
 }
 
-/* Events */
+/* ===== J) Events ===== */
 showEn.addEventListener('change', ()=> document.querySelectorAll('.en').forEach(n=> n.style.display = showEn.checked ? 'block' : 'none'));
 [levelSelect, countSelect].forEach(sel=> sel.addEventListener('change', computeTodaySet));
 btnPrev.addEventListener('click', ()=>{ if(currentIndex>0){ currentIndex--; renderCurrent(); } });
@@ -467,7 +536,7 @@ window.addEventListener('keydown', (e)=>{
   });
 })();
 
-/* Init */
+/* ===== K) Init ===== */
 (async function init(){
   await loadArticlesJSON();
   loadVoices();
