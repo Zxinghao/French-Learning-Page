@@ -8,7 +8,6 @@
   :root{
     --ink:#0f172a; --muted:#475569;
     --border:#dfe7ef; --shadow:0 10px 32px rgba(2,6,23,.16);
-    --barH:56px;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
@@ -44,7 +43,11 @@
     min-height:44px; display:inline-flex; align-items:center; gap:8px; backdrop-filter: blur(6px);
   }
   select{cursor:pointer}
-  .btn{cursor:pointer; background:rgba(238,242,255,.9); transition:transform .05s ease, opacity .2s ease}
+  .btn{
+    cursor:pointer; background:rgba(238,242,255,.9);
+    transition:transform .05s ease, opacity .2s ease;
+    touch-action: manipulation; /* ensure taps fire immediately on iOS */
+  }
   .btn:active{transform:scale(.98)}
   .btn.primary{background:linear-gradient(90deg,#2563eb,#16a34a); color:white; border:none}
 
@@ -86,10 +89,8 @@
     .wrap{padding:0 10px}
     article{padding:16px 14px}
     h1.title{font-size:1.15rem}
-    /* Collapse grammar by default on small screens for less clutter */
-    details[open]{}
-    details.auto-collapsed[open]{}
   }
+
   /* Reduce animation if user prefers */
   @media (prefers-reduced-motion: reduce){
     #bgCanvas{display:none}
@@ -117,9 +118,9 @@
       <label class="chip"><input type="checkbox" id="showEn" /> EN</label>
       <label class="chip"><input type="checkbox" id="slow" /> Slow</label>
       <label class="chip">Voice: <select id="voiceSel"></select></label>
-      <button class="btn" id="play">▶️ Play</button>
-      <button class="btn" id="stop">⏹ Stop</button>
-      <button class="btn primary" id="reroll">🔁 Reroll</button>
+      <button class="btn" id="play" type="button">▶️ Play</button>
+      <button class="btn" id="stop" type="button">⏹ Stop</button>
+      <button class="btn primary" id="reroll" type="button">🔁 Reroll</button>
     </div>
   </div>
 </div>
@@ -130,9 +131,9 @@
     <h1 class="title" id="title"></h1>
 
     <div class="pager">
-      <button class="btn" id="prev">← Prev</button>
+      <button class="btn" id="prev" type="button">← Prev</button>
       <div class="index" id="idx">1 / 1</div>
-      <button class="btn" id="next">Next →</button>
+      <button class="btn" id="next" type="button">Next →</button>
     </div>
 
     <div class="content" id="content"></div>
@@ -163,7 +164,6 @@
   const ctx = c.getContext('2d', {alpha:true});
   let W=0, H=0, t=0, raf, mobile = /iPhone|Android/i.test(navigator.userAgent);
 
-  // fewer ribbons + slower movement on mobile
   const ribbons = (mobile ? [
     {amp: 26, freq: 0.0012, speed: 0.00018, hue: 210, alpha: 0.10},
     {amp: 36, freq: 0.0009, speed: 0.00014, hue: 190, alpha: 0.09}
@@ -176,7 +176,6 @@
   function sizeToViewport(){
     const dpr = Math.min(window.devicePixelRatio||1, mobile ? 1.5 : 2);
     const vw = window.innerWidth;
-    // Use visualViewport height on iOS to avoid 100vh jumps when the address bar hides
     const vh = (window.visualViewport?.height) || window.innerHeight;
     W = c.width  = Math.floor(vw * dpr);
     H = c.height = Math.floor(vh * dpr);
@@ -215,16 +214,19 @@
   }
 
   function frame(){
-    t += 1; // tiny speeds; overall very slow
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    t += 1;
     const g = ctx.createLinearGradient(0,0,0,H);
     g.addColorStop(0, '#f7fbff'); g.addColorStop(1, '#eef6ff');
     ctx.fillStyle = g; ctx.fillRect(0,0,c.clientWidth,H);
     ribbons.forEach((r,i)=> drawRibbon(r, i*1.05));
     raf = requestAnimationFrame(frame);
   }
-  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) frame();
+  frame();
 })();
+</script>
 
+<script>
 /* ===== B) Default articles (fallback if JSON isn't found) ===== */
 var DEFAULT_ARTICLES = [
   {
@@ -248,7 +250,7 @@ var DEFAULT_ARTICLES = [
       {point:"Infinitif prépositionnel", fr:"« avant de + inf. » antériorité; « pour + inf. » but.", en:"'avant de' (before), 'pour' (purpose)."}
     ]
   }
-  /* (B1/B2 omitted here for brevity; your JSON will override anyway) */
+  /* (You can keep only A2 here; your articles.json will override) */
 ];
 
 /* ===== C) JSON loader (articles.json) ===== */
@@ -323,7 +325,7 @@ function renderCurrent(){
   idxEl.textContent = `${currentIndex+1} / ${currentSet.length}`;
   document.querySelectorAll('.en').forEach(n=> n.style.display = showEn.checked ? 'block' : 'none');
 
-  // Auto-collapse grammar on small screens for less clutter
+  // Auto-collapse grammar/vocab on small screens for less clutter
   if (window.innerWidth <= 640) {
     document.getElementById('grammarBox').open = false;
     document.getElementById('vocabBox').open = false;
@@ -389,22 +391,49 @@ window.addEventListener('keydown', (e)=>{
   if(e.code==='Space'){ e.preventDefault(); togglePlay(); }
 });
 
-/* Swipe left/right on the card */
+/* ===== I) Swipe left/right on the card (safe with buttons) ===== */
 (function(){
-  let x0=null, y0=null, t0=0;
-  card.addEventListener('touchstart', (e)=>{ const t=e.changedTouches[0]; x0=t.clientX; y0=t.clientY; t0=Date.now(); }, {passive:true});
+  let x0=null, y0=null, t0=0, startTarget=null;
+
+  function isControl(el){
+    return el && el.closest('.btn, button, select, option, summary, details, a, input, textarea, label');
+  }
+
+  card.addEventListener('touchstart', (e)=>{
+    const t = e.changedTouches[0];
+    x0 = t.clientX; y0 = t.clientY; t0 = Date.now();
+    startTarget = e.target;
+  }, {passive:true});
+
   card.addEventListener('touchend', (e)=>{
-    if(x0==null) return;
-    const t=e.changedTouches[0]; const dx=t.clientX - x0; const dy=t.clientY - y0; const dt=Date.now()-t0;
-    x0=y0=null;
+    if (x0==null) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - x0;
+    const dy = t.clientY - y0;
+    const dt = Date.now() - t0;
+
+    // reset for next gesture
+    x0 = y0 = null;
+
+    // If the touch began on a control, don't treat it as a swipe
+    if (isControl(startTarget)) { startTarget = null; return; }
+    startTarget = null;
+
+    // Only treat as swipe if it’s a quick, mostly-horizontal gesture
     if (Math.abs(dx) > 60 && Math.abs(dy) < 40 && dt < 600){
       if (dx < 0 && currentIndex < currentSet.length-1) { currentIndex++; renderCurrent(); }
       else if (dx > 0 && currentIndex > 0) { currentIndex--; renderCurrent(); }
     }
   }, {passive:true});
+
+  // Extra safety: stop click bubbling from buttons so swipe handler never interferes
+  ['prev','next','play','stop','reroll'].forEach(id=>{
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('click', (e)=> e.stopPropagation());
+  });
 })();
 
-/* ===== I) Init ===== */
+/* ===== J) Init ===== */
 (async function init(){
   await loadArticlesJSON();
   loadVoices();
@@ -413,4 +442,3 @@ window.addEventListener('keydown', (e)=>{
 </script>
 </body>
 </html>
-
