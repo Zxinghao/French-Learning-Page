@@ -2,68 +2,98 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>French Daily Reader — Calm Dynamic Background</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>French Daily Reader — Mobile</title>
 <style>
-  :root{ --ink:#0f172a; --muted:#475569; --border:#dfe7ef; --shadow:0 12px 40px rgba(2,6,23,.16); }
+  :root{
+    --ink:#0f172a; --muted:#475569;
+    --border:#dfe7ef; --shadow:0 10px 32px rgba(2,6,23,.16);
+    --barH:56px;
+  }
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
     margin:0; font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Noto Sans", sans-serif;
-    color:var(--ink); line-height:1.7; background:#f6f9ff; overflow-x:hidden;
+    color:var(--ink); line-height:1.65; background:#f6f9ff; overflow-x:hidden;
+    -webkit-tap-highlight-color: transparent;
   }
 
-  /* CALM background canvas */
+  /* Calm background canvas */
   #bgCanvas{position:fixed; inset:0; z-index:-2; background:linear-gradient(180deg,#f7fbff,#eef6ff)}
 
-  /* Top bar */
+  /* Top bar (safe area aware) */
   .topbar{
-    position:fixed; top:0; left:0; right:0; z-index:10;
-    backdrop-filter:saturate(1.1) blur(10px);
-    background:rgba(255,255,255,.55); border-bottom:1px solid rgba(226,232,240,.8);
+    position:sticky; top:0; z-index:10;
+    backdrop-filter:saturate(1.05) blur(10px);
+    background:rgba(255,255,255,.62); border-bottom:1px solid rgba(226,232,240,.85);
   }
   .topwrap{
-    max-width:1100px; margin:0 auto; padding:10px 14px;
-    display:flex; gap:12px; align-items:center; justify-content:space-between;
+    max-width:1100px; margin:0 auto;
+    padding:calc(env(safe-area-inset-top) + 8px) 14px 8px;
+    display:flex; gap:10px; align-items:center; justify-content:space-between;
   }
   .brand{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.2px}
   .brand .dot{width:10px; height:10px; border-radius:50%; background:linear-gradient(135deg,#2563eb,#16a34a)}
+
   .controls{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
   .chip, select, .btn{
-    border:1px solid var(--border); background:rgba(255,255,255,.7); color:var(--ink);
-    padding:8px 12px; border-radius:12px; font-weight:600; font-size:.95rem; backdrop-filter: blur(6px);
+    border:1px solid var(--border);
+    background:rgba(255,255,255,.75);
+    color:var(--ink);
+    padding:10px 12px; border-radius:14px; font-weight:600; font-size:16px; /* 16px to avoid iOS zoom */
+    min-height:44px; display:inline-flex; align-items:center; gap:8px; backdrop-filter: blur(6px);
   }
   select{cursor:pointer}
-  .btn{cursor:pointer; background:rgba(238,242,255,.85); transition:transform .05s ease, opacity .2s ease}
+  .btn{cursor:pointer; background:rgba(238,242,255,.9); transition:transform .05s ease, opacity .2s ease}
   .btn:active{transform:scale(.98)}
   .btn.primary{background:linear-gradient(90deg,#2563eb,#16a34a); color:white; border:none}
 
-  /* Reading card */
-  .wrap{max-width:880px; margin:120px auto 80px; padding:0 16px}
+  /* Layout */
+  .wrap{max-width:900px; margin:12px auto 70px; padding:0 14px}
   article{
-    background:rgba(255,255,255,.72);
+    background:rgba(255,255,255,.78);
     backdrop-filter: blur(10px);
-    border:1px solid rgba(231,237,243,.9); border-radius:22px;
-    padding:24px 22px 18px; box-shadow:var(--shadow);
+    border:1px solid rgba(231,237,243,.95); border-radius:22px;
+    padding:18px 16px; box-shadow:var(--shadow);
+    touch-action: pan-y; /* allow vertical scroll but capture horizontal swipes */
   }
-  h1.title{margin:.2rem 0 .4rem; font-size:1.38rem}
-  .meta{display:flex; gap:10px; flex-wrap:wrap; color:var(--muted); font-size:.95rem; margin-bottom:8px}
-  .tag{border:1px dashed #cbd5e1; padding:2px 10px; border-radius:999px; background:rgba(248,250,252,.85)}
-  .content p{margin:.9rem 0}
+  h1.title{margin:.2rem 0 .3rem; font-size:1.25rem}
+  .meta{display:flex; gap:8px; flex-wrap:wrap; color:var(--muted); font-size:.95rem; margin-bottom:6px}
+  .tag{border:1px dashed #cbd5e1; padding:3px 10px; border-radius:999px; background:rgba(248,250,252,.9)}
+  .content p{margin:.85rem 0}
   .content p strong{font-weight:700}
-  details{margin-top:14px; border-top:1px dashed rgba(226,232,240,.9); padding-top:10px}
-  summary{cursor:pointer; font-weight:700}
-  ul{margin:.35rem 0 .6rem 1.1rem}
+  details{margin-top:10px; border-top:1px dashed rgba(226,232,240,.9); padding-top:8px}
+  summary{cursor:pointer; font-weight:700; outline:none}
+  ul{margin:.3rem 0 .5rem 1.05rem}
   .en{display:none; color:#0b3d92}
   .muted{color:var(--muted)}
   .note{font-size:.92rem; color:var(--muted); margin-top:6px}
 
   /* Pager */
-  .pager{display:flex; align-items:center; justify-content:space-between; gap:10px; margin:14px 0 10px;}
+  .pager{
+    display:flex; align-items:center; justify-content:space-between; gap:8px; margin:10px 0 6px;
+  }
   .pager .index{color:var(--muted); font-weight:700}
+  .pager .btn{flex:0 0 auto; min-width:80px; justify-content:center}
 
-  footer{color:var(--muted); text-align:center; margin:24px 0 22px; font-size:.9rem}
-  .kbd{font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:.9em; background:rgba(248,250,252,.85); border:1px solid #e2e8f0; padding:1px 6px; border-radius:6px}
+  footer{color:var(--muted); text-align:center; margin:14px 0 calc(14px + env(safe-area-inset-bottom)); font-size:.95rem}
+  .kbd{font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:.95em; background:rgba(248,250,252,.9); border:1px solid #e2e8f0; padding:2px 6px; border-radius:6px}
+
+  /* Mobile tweaks */
+  @media (max-width: 640px){
+    .controls{gap:6px}
+    .chip{padding:8px 10px; min-height:44px}
+    .wrap{padding:0 10px}
+    article{padding:16px 14px}
+    h1.title{font-size:1.15rem}
+    /* Collapse grammar by default on small screens for less clutter */
+    details[open]{}
+    details.auto-collapsed[open]{}
+  }
+  /* Reduce animation if user prefers */
+  @media (prefers-reduced-motion: reduce){
+    #bgCanvas{display:none}
+  }
 </style>
 </head>
 <body>
@@ -107,12 +137,12 @@
 
     <div class="content" id="content"></div>
 
-    <details>
+    <details id="vocabBox">
       <summary>Vocabulaire utile</summary>
       <ul id="vocab"></ul>
     </details>
 
-    <details open>
+    <details id="grammarBox">
       <summary>Points de grammaire (détaillés)</summary>
       <ul id="grammar"></ul>
       <div class="note">Astuce : retrouve chaque structure dans le texte, puis lis la phrase à voix haute.</div>
@@ -122,77 +152,81 @@
   </article>
 
   <footer id="dateInfo">
-    Shortcuts: <span class="kbd">←/→</span> switch articles, <span class="kbd">Space</span> Play/Pause.
+    Tips: swipe on the card to switch • <span class="kbd">Space</span> Play/Pause.
   </footer>
 </div>
 
 <script>
-/* ===== (A) Calm dynamic background: slow aurora ribbons ===== */
+/* ===== A) Ultra-calm background optimized for iPhone ===== */
 (function(){
   const c = document.getElementById('bgCanvas');
   const ctx = c.getContext('2d', {alpha:true});
-  let W=0, H=0, t=0, raf;
-  const ribbons = [
-    {amp: 28,  freq: 0.0016, speed: 0.00035, hue: 210, alpha: 0.10},
-    {amp: 36,  freq: 0.0012, speed: 0.00028, hue: 190, alpha: 0.10},
-    {amp: 44,  freq: 0.0010, speed: 0.00022, hue: 230, alpha: 0.10},
-    {amp: 58,  freq: 0.0008, speed: 0.00018, hue: 170, alpha: 0.08}
-  ];
-  function resize(){
-    const dpr = Math.min(window.devicePixelRatio||1, 2);
-    W = c.width  = Math.floor(window.innerWidth * dpr);
-    H = c.height = Math.floor(window.innerHeight * dpr);
-    c.style.width  = window.innerWidth + 'px';
-    c.style.height = window.innerHeight + 'px';
+  let W=0, H=0, t=0, raf, mobile = /iPhone|Android/i.test(navigator.userAgent);
+
+  // fewer ribbons + slower movement on mobile
+  const ribbons = (mobile ? [
+    {amp: 26, freq: 0.0012, speed: 0.00018, hue: 210, alpha: 0.10},
+    {amp: 36, freq: 0.0009, speed: 0.00014, hue: 190, alpha: 0.09}
+  ] : [
+    {amp: 28, freq: 0.0016, speed: 0.00030, hue: 210, alpha: 0.10},
+    {amp: 36, freq: 0.0012, speed: 0.00024, hue: 190, alpha: 0.09},
+    {amp: 44, freq: 0.0010, speed: 0.00020, hue: 230, alpha: 0.09}
+  ]);
+
+  function sizeToViewport(){
+    const dpr = Math.min(window.devicePixelRatio||1, mobile ? 1.5 : 2);
+    const vw = window.innerWidth;
+    // Use visualViewport height on iOS to avoid 100vh jumps when the address bar hides
+    const vh = (window.visualViewport?.height) || window.innerHeight;
+    W = c.width  = Math.floor(vw * dpr);
+    H = c.height = Math.floor(vh * dpr);
+    c.style.width  = vw + 'px';
+    c.style.height = vh + 'px';
     ctx.setTransform(dpr,0,0,dpr,0,0);
   }
-  window.addEventListener('resize', resize, {passive:true});
-  resize();
+  sizeToViewport();
+  window.addEventListener('resize', sizeToViewport, {passive:true});
+  if (window.visualViewport) {
+    visualViewport.addEventListener('resize', sizeToViewport, {passive:true});
+    visualViewport.addEventListener('scroll', sizeToViewport, {passive:true});
+  }
 
-  function drawRibbon({amp,freq,speed,hue,alpha}, phase){
+  function drawRibbon(r, phase){
     const grad = ctx.createLinearGradient(0,0,0,H);
-    grad.addColorStop(0, `hsla(${hue}, 80%, 90%, ${alpha})`);
-    grad.addColorStop(1, `hsla(${(hue+40)%360}, 90%, 80%, ${alpha})`);
+    grad.addColorStop(0, `hsla(${r.hue}, 80%, 90%, ${r.alpha})`);
+    grad.addColorStop(1, `hsla(${(r.hue+40)%360}, 90%, 80%, ${r.alpha})`);
     ctx.fillStyle = grad;
 
     ctx.beginPath();
-    const yBase = H*0.35 + Math.sin(t*speed + phase)*20;
+    const yBase = H*0.35 + Math.sin(t*r.speed + phase)*18;
     ctx.moveTo(0, yBase);
-    const steps = 24; // fewer points = smoother, lighter
+    const steps = mobile ? 18 : 24;
     for(let i=0;i<=steps;i++){
-      const x = (i/steps)*window.innerWidth;
+      const x = (i/steps)*c.clientWidth;
       const y = yBase
-        + Math.sin( (x*freq) + t*speed + phase ) * amp
-        + Math.cos( (x*freq*0.6) - t*speed*0.7 + phase*0.7 ) * (amp*0.35);
+        + Math.sin( (x*r.freq) + t*r.speed + phase ) * r.amp
+        + Math.cos( (x*r.freq*0.6) - t*r.speed*0.7 + phase*0.7 ) * (r.amp*0.33);
       ctx.lineTo(x, y);
     }
-    ctx.lineTo(window.innerWidth, H);
+    ctx.lineTo(c.clientWidth, H);
     ctx.lineTo(0, H);
     ctx.closePath();
     ctx.fill();
   }
 
-  function step(){
-    t += 1; // time in frames; actual speeds are tiny above
-    // soft base
+  function frame(){
+    t += 1; // tiny speeds; overall very slow
     const g = ctx.createLinearGradient(0,0,0,H);
     g.addColorStop(0, '#f7fbff'); g.addColorStop(1, '#eef6ff');
-    ctx.fillStyle = g; ctx.fillRect(0,0,window.innerWidth,H);
-
-    // draw ribbons (back to front)
-    ribbons.forEach((r, i)=> drawRibbon(r, i*1.1));
-
-    raf = requestAnimationFrame(step);
+    ctx.fillStyle = g; ctx.fillRect(0,0,c.clientWidth,H);
+    ribbons.forEach((r,i)=> drawRibbon(r, i*1.05));
+    raf = requestAnimationFrame(frame);
   }
-  step();
-  document.addEventListener('visibilitychange', ()=> {
-    if(document.hidden){ cancelAnimationFrame(raf); }
-    else { raf = requestAnimationFrame(step); }
-  });
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) frame();
 })();
 
-/* ===== (B) Articles (A2→B2, ≥200 words each) ===== */
-var ARTICLES = [
+/* ===== B) Default articles (fallback if JSON isn't found) ===== */
+var DEFAULT_ARTICLES = [
   {
     id:"a2_routine_long", level:"A2",
     title:"Ma routine du matin, simple mais efficace",
@@ -210,183 +244,173 @@ var ARTICLES = [
     vocab:[["se réveiller doucement","to wake up gently"],["aérer la chambre","to air the room"],["lancer une tâche","to start a task"],["du bon pied","on the right foot"]],
     grammar:[
       {point:"Présent de l’habitude + adverbes d’ordre", fr:"Présent pour les routines (« je me lève », « je prends »). Adverbes: ensuite, puis, quand. « Quand » peut exprimer une habitude au présent.", en:"Present for routines; order adverbs; 'quand' can be habitual."},
-      {point:"Si + présent (condition réelle)", fr:"Conséquence stable: « S’il pleut, je prends le bus. » Présent dans les deux propositions. Inversion possible sans changement de sens.", en:"Real condition uses present; word order flexible."},
-      {point:"Infinitif prépositionnel", fr:"« avant de + inf. » antériorité; « pour + inf. » but. Ex.: « avant d’allumer », « pour gagner du temps ». ", en:"'avant de' = before; 'pour' = purpose."}
-    ]
-  },
-  {
-    id:"b1_project_long", level:"B1",
-    title:"Organiser un projet personnel sur un mois",
-    title_en:"Organizing a personal project over a month",
-    body:[
-`Au début, je définis un objectif clair et mesurable. Par exemple : « terminer une courte histoire de deux mille mots » ou « réaliser une vidéo de cinq minutes ». Ensuite, je découpe l’objectif en petites étapes concrètes : trouver l’idée, faire un plan simple, produire une première version, relire ou monter, puis publier. Je réserve des créneaux fixes trois ou quatre fois par semaine, d’environ quarante-cinq minutes, et j’éteins les notifications pendant ce temps pour rester concentré.`,
-`Je tiens un carnet de bord où je note les obstacles rencontrés et les solutions testées. Cela m’aide à comprendre ce qui fonctionne pour moi. Par exemple, je constate que je travaille mieux le matin, après un café, et que j’avance davantage quand je commence par une mini-tâche très facile. Je me fixe aussi des limites : pas plus d’une heure de recherche d’inspiration, pour éviter de me perdre sur Internet. Enfin, je demande un retour à un ami une fois par semaine, afin d’avoir un regard extérieur et des suggestions concrètes.`,
-`À la fin de chaque semaine, je fais un bilan rapide : ce que j’ai accompli, ce qui a bloqué, ce que je vais essayer ensuite. Si je prends du retard, je réduis le périmètre au lieu d’abandonner : une histoire plus courte, une vidéo plus simple. Le but est de terminer quelque chose de présentable. En un mois, je progresse non seulement sur le contenu, mais aussi sur la méthode : j’apprends à mieux planifier, à évaluer mon temps et à garder la motivation sans pression excessive.`
-    ],
-    body_en:[
-`At the start, I define a clear, measurable goal: “finish a short story of two thousand words” or “make a five-minute video.” Then I break it into concrete steps: find the idea, outline, produce a first version, revise or edit, then publish. I block fixed slots three or four times a week for about forty-five minutes and turn off notifications to stay focused.`,
-`I keep a logbook where I note obstacles and tested solutions. It helps me see what works for me. For example, I notice I work better in the morning after coffee, and I make more progress when I begin with a very easy mini-task. I also set limits: no more than one hour of inspiration research, to avoid getting lost online. Finally, I ask a friend for feedback once a week to get an outside view and concrete suggestions.`,
-`At the end of each week, I do a quick review: what I accomplished, what blocked me, what I’ll try next. If I fall behind, I reduce scope instead of giving up: a shorter story, a simpler video. The aim is to finish something presentable. In a month, I progress not only on the content but also on the method: I learn to plan better, estimate my time, and keep motivation without excessive pressure.`
-    ],
-    vocab:[["un carnet de bord","logbook / progress journal"],["un créneau","time slot"],["réduire le périmètre","reduce scope"]],
-    grammar:[
-      {point:"Infinitif de but / restriction", fr:"« pour + inf. » exprime le but. « afin de »: registre plus formel. « pour éviter de + inf. » marque la restriction.", en:"Purpose with 'pour/afin de'; restriction with 'pour éviter de'."},
-      {point:"Relatives (qui/que/où/dont) + accords", fr:"« ce que j’ai accompli », « les solutions que j’ai testées ». Rappel : avec « que » COD placé avant, accord du participe passé (« testées »).", en:"Relative pronouns; past participle agreement with preceding COD."},
-      {point:"Concession (même si / bien que)", fr:"« même si » + indicatif ; « bien que » + subjonctif : nuance plus soutenue.", en:"'même si' + indicative; 'bien que' + subjunctive."}
-    ]
-  },
-  {
-    id:"b2_media_long", level:"B2",
-    title:"Lire l’actualité avec méthode et distance critique",
-    title_en:"Reading the news methodically and critically",
-    body:[
-`Face au flux continu d’informations, je commence par vérifier la nature de la source : média reconnu, blog personnel, réseau social ? Je regarde la date de publication et, si possible, la date des faits. Lorsque le titre est très alarmant, je lis l’article en entier pour repérer les nuances, les limites de l’étude citée et les éventuelles contradictions. Ensuite, je cherche un deuxième article, idéalement d’un média au positionnement éditorial différent, pour comparer les angles.`,
-`Je prête attention au vocabulaire : mots évaluatifs (« catastrophique », « honteux ») ou formulations prudentes (« il est probable que », « les données suggèrent que »). Les chiffres demandent toujours du contexte : l’échantillon, la période, la méthodologie. Lorsqu’un graphique est présenté, je vérifie l’axe, l’unité et l’échelle. Si une citation circule sur les réseaux, j’essaie d’en retrouver la source complète, car les extraits très courts simplifient souvent à l’excès.`,
-`Enfin, je garde une distance émotionnelle : si une nouvelle me met en colère, j’attends quelques minutes avant de partager. Je me demande : « Quel est l’objectif de cette publication ? Informer, convaincre, vendre ? » Pour rester équilibré, j’ajoute à mon fil des médias internationaux et des médias locaux spécialisés. Avec cette méthode, je lis moins d’articles, mais je les comprends mieux, et je résiste davantage aux interprétations rapides et aux titres sensationnalistes.`
-    ],
-    body_en:[
-`Faced with a continuous flow of information, I first check the type of source: established outlet, personal blog, social network? I look at the publication date and, if possible, the date of the events. When the headline is very alarming, I read the entire article to spot nuance, limits of any cited study, and possible contradictions. Then I look for a second article—ideally from a publication with a different editorial stance—to compare angles.`,
-`I pay attention to wording: evaluative terms (“catastrophic,” “shameful”) vs. cautious formulations (“it is likely that,” “the data suggest that”). Numbers always need context: sample, period, methodology. If a chart is shown, I check the axis, unit, and scale. If a quote circulates on social media, I try to find the full source, because short snippets often oversimplify.`,
-`Finally, I keep emotional distance: if news makes me angry, I wait a few minutes before sharing. I ask myself: “What is the goal of this publication? Inform, persuade, sell?” To stay balanced, I add both international outlets and specialized local media to my feed. With this method, I read fewer pieces but understand them better, and I resist snap interpretations and sensational headlines.`
-    ],
-    vocab:[["positionnement éditorial","editorial stance"],["échantillon","sample (statistics)"],["titre sensationnaliste","sensational headline"]],
-    grammar:[
-      {point:"Impersonnels de probabilité", fr:"« Il est probable que… » (ind./subj. selon registre). « Il est possible que… » prend souvent le subjonctif (« ce soit »).", en:"Indicative vs. subjunctive varies with certainty/register."},
-      {point:"Subordonnées circonstancielles", fr:"Temps (« lorsque »), but (« pour »), opposition (« bien que » + subj.).", en:"Temporal, purpose, concession; subjunctive after 'bien que'."},
-      {point:"Nominalisations", fr:"« publication », « interprétation », « méthodologie » : utiles pour condenser une idée et structurer l’argumentation.", en:"Nominalizations help concision and structure."}
+      {point:"Si + présent (condition réelle)", fr:"Conséquence stable: « S’il pleut, je prends le bus. » Présent dans les deux propositions.", en:"Real condition uses present both sides."},
+      {point:"Infinitif prépositionnel", fr:"« avant de + inf. » antériorité; « pour + inf. » but.", en:"'avant de' (before), 'pour' (purpose)."}
     ]
   }
+  /* (B1/B2 omitted here for brevity; your JSON will override anyway) */
 ];
 
-/* ===== (C) Utilities & selection ===== */
+/* ===== C) JSON loader (articles.json) ===== */
+let ARTICLES = DEFAULT_ARTICLES;
+async function loadArticlesJSON(){
+  try{
+    const res = await fetch('./articles.json', {cache:'no-store'});
+    if(!res.ok) throw 0;
+    const json = await res.json();
+    if(Array.isArray(json) && json.length) ARTICLES = json;
+  }catch(e){
+    // keep DEFAULT_ARTICLES
+  }
+}
+
+/* ===== D) Utilities ===== */
 function getParisDateKey(){
-  var fmt = new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit'});
+  const fmt = new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit'});
   return fmt.format(new Date());
 }
-function mulberry32(a){return function(){var t=a+=0x6D2B79F5;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return ((t^t>>>14)>>>0)/4294967296}}
-function hashStr(s){var h=2166136261>>>0; for(var i=0;i<s.length;i++){h^=s.charCodeAt(i); h=Math.imul(h,16777619)} return h>>>0;}
-function byLevel(level){ return level==='mix' ? ARTICLES.slice() : ARTICLES.filter(function(a){return a.level===level;}); }
+function mulberry32(a){return function(){let t=a+=0x6D2B79F5;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return ((t^t>>>14)>>>0)/4294967296}}
+function hashStr(s){let h=2166136261>>>0; for(let i=0;i<s.length;i++){h^=s.charCodeAt(i); h=Math.imul(h,16777619)} return h>>>0;}
+function byLevel(level){ return level==='mix' ? ARTICLES.slice() : ARTICLES.filter(a=>a.level===level); }
 function pickStable(arr, n, seed){
-  var rng = mulberry32(seed), idx = arr.map(function(_,i){return i;});
-  for(var i=idx.length-1;i>0;i--){var j=Math.floor(rng()*(i+1)); var t=idx[i]; idx[i]=idx[j]; idx[j]=t;}
-  return idx.slice(0, Math.min(n, idx.length)).map(function(i){return arr[i];});
+  const rng = mulberry32(seed), idx = arr.map((_,i)=>i);
+  for(let i=idx.length-1;i>0;i--){const j=Math.floor(rng()*(i+1)); [idx[i],idx[j]]=[idx[j],idx[i]];}
+  return idx.slice(0, Math.min(n, idx.length)).map(i=>arr[i]);
 }
 function countWords(frParas){ return frParas.join(' ').trim().split(/\s+/).filter(Boolean).length; }
-function readTime(words){ var min = Math.max(1, Math.round(words/180)); return min + " min"; }
+function readTime(words){ const min = Math.max(1, Math.round(words/180)); return min + " min"; }
 
-/* ===== (D) DOM & state ===== */
-var titleEl = document.getElementById('title');
-var subEl   = document.getElementById('subtitle');
-var metaEl  = document.getElementById('meta');
-var contentEl = document.getElementById('content');
-var vocabEl = document.getElementById('vocab');
-var gramEl  = document.getElementById('grammar');
-var idxEl   = document.getElementById('idx');
-var voiceSel= document.getElementById('voiceSel');
-var showEn  = document.getElementById('showEn');
-var slow    = document.getElementById('slow');
-var levelSelect = document.getElementById('levelSelect');
-var countSelect = document.getElementById('countSelect');
-var btnPrev = document.getElementById('prev');
-var btnNext = document.getElementById('next');
-var btnPlay = document.getElementById('play');
-var btnStop = document.getElementById('stop');
-var btnReroll = document.getElementById('reroll');
-var dateInfoEl = document.getElementById('dateInfo');
+/* ===== E) DOM ===== */
+const titleEl = document.getElementById('title');
+const subEl   = document.getElementById('subtitle');
+const metaEl  = document.getElementById('meta');
+const contentEl = document.getElementById('content');
+const vocabEl = document.getElementById('vocab');
+const gramEl  = document.getElementById('grammar');
+const idxEl   = document.getElementById('idx');
+const voiceSel= document.getElementById('voiceSel');
+const showEn  = document.getElementById('showEn');
+const slow    = document.getElementById('slow');
+const levelSelect = document.getElementById('levelSelect');
+const countSelect = document.getElementById('countSelect');
+const btnPrev = document.getElementById('prev');
+const btnNext = document.getElementById('next');
+const btnPlay = document.getElementById('play');
+const btnStop = document.getElementById('stop');
+const btnReroll = document.getElementById('reroll');
+const dateInfoEl = document.getElementById('dateInfo');
+const card = document.getElementById('card');
 
-var voices = [];
-var currentSet = [];
-var currentIndex = 0;
-var rerollSalt = 0;
+/* ===== F) State & selection ===== */
+let voices = [];
+let currentSet = [];
+let currentIndex = 0;
+let rerollSalt = 0;
 
-/* ===== (E) Render & selection ===== */
 function updateDateInfo(){
-  var key = getParisDateKey();
-  dateInfoEl.innerHTML = 'Today (Europe/Paris): ' + key + ' • <span class="muted">Use ←/→ to navigate</span>';
+  const key = getParisDateKey();
+  dateInfoEl.innerHTML = 'Today (Europe/Paris): ' + key + ' • Swipe on the card to switch';
 }
 function renderCurrent(){
-  var a = currentSet[currentIndex]; if(!a) return;
-  var words = countWords(a.body);
-  metaEl.innerHTML = '<span class="tag">Level: ' + a.level + '</span>' +
-                     '<span class="tag">' + words + ' words • ~' + readTime(words) + '</span>';
+  const a = currentSet[currentIndex]; if(!a) return;
+  const words = countWords(a.body);
+  metaEl.innerHTML = `<span class="tag">Level: ${a.level}</span><span class="tag">${words} words • ~${readTime(words)}</span>`;
   titleEl.textContent = a.title;
-  subEl.innerHTML = '<em>' + a.title_en + '</em>';
-  contentEl.innerHTML = a.body.map(function(p,i){
-    return '<p>' + p + '</p><p class="en">' + (a.body_en[i]||'') + '</p>';
-  }).join('');
-  vocabEl.innerHTML = a.vocab.map(function(v){ return '<li><strong>' + v[0] + '</strong> — <span class="muted">' + v[1] + '</span></li>'; }).join('');
-  gramEl.innerHTML  = a.grammar.map(function(g){ return '<li><strong>' + g.point + '.</strong> ' + g.fr + ' <span class="muted">(' + g.en + ')</span></li>'; }).join('');
-  idxEl.textContent = (currentIndex+1) + ' / ' + currentSet.length;
-  Array.prototype.forEach.call(document.querySelectorAll('.en'), function(n){ n.style.display = showEn.checked ? 'block' : 'none'; });
+  subEl.innerHTML = a.title_en ? `<em>${a.title_en}</em>` : '';
+  contentEl.innerHTML = a.body.map((p,i)=>`<p>${p}</p><p class="en">${a.body_en?.[i]||''}</p>`).join('');
+  vocabEl.innerHTML = (a.vocab||[]).map(v=>`<li><strong>${v[0]}</strong> — <span class="muted">${v[1]}</span></li>`).join('');
+  gramEl.innerHTML  = (a.grammar||[]).map(g=>`<li><strong>${g.point}.</strong> ${g.fr} <span class="muted">(${g.en})</span></li>`).join('');
+  idxEl.textContent = `${currentIndex+1} / ${currentSet.length}`;
+  document.querySelectorAll('.en').forEach(n=> n.style.display = showEn.checked ? 'block' : 'none');
+
+  // Auto-collapse grammar on small screens for less clutter
+  if (window.innerWidth <= 640) {
+    document.getElementById('grammarBox').open = false;
+    document.getElementById('vocabBox').open = false;
+  }
 }
 function computeTodaySet(){
-  var key = getParisDateKey();
-  var lvl = levelSelect.value;
-  var n = parseInt(countSelect.value, 10);
-  var pool = byLevel(lvl);
-  var seed = hashStr(key + '|' + lvl + '|' + n + '|' + rerollSalt);
+  const key = getParisDateKey();
+  const lvl = levelSelect.value;
+  const n = parseInt(countSelect.value, 10);
+  const pool = byLevel(lvl);
+  const seed = hashStr(key + '|' + lvl + '|' + n + '|' + rerollSalt);
   currentSet = pickStable(pool, n, seed);
   currentIndex = 0;
   updateDateInfo();
   renderCurrent();
 }
 
-/* ===== (F) Audio (TTS) ===== */
+/* ===== G) Audio (TTS) ===== */
 function loadVoices(){
-  var all = window.speechSynthesis.getVoices();
-  voices = all.filter(function(v){ return /^fr(-|_|$)/i.test(v.lang) || /French/i.test(v.name); });
-  if (voices.length === 0) { voices = all.length ? all : []; }
+  const all = window.speechSynthesis.getVoices();
+  voices = all.filter(v=> /^fr(-|_|$)/i.test(v.lang) || /French/i.test(v.name));
+  if (!voices.length) voices = all.length ? all : [];
   voiceSel.innerHTML = voices.length
-    ? voices.map(function(v,i){ return '<option value="'+i+'">'+v.name+' — '+v.lang + ( /^fr/i.test(v.lang)? '' : ' (no FR)' ) +'</option>'; }).join('')
-    : '<option value="-1">No voices detected</option>';
+    ? voices.map((v,i)=>`<option value="${i}">${v.name} — ${v.lang}${/^fr/i.test(v.lang)?'':' (no FR)'}</option>`).join('')
+    : `<option value="-1">No voices detected</option>`;
 }
 window.speechSynthesis.onvoiceschanged = loadVoices;
 setTimeout(loadVoices, 800);
 
 function speakCurrent(){
-  window.speechSynthesis.cancel();
-  var a = currentSet[currentIndex]; if(!a) return;
-  var rate = slow.checked ? 0.85 : 1.0;
-  var chosen = voices[voiceSel.selectedIndex] || voices[0];
-  a.body.forEach(function(txt){
-    var u = new SpeechSynthesisUtterance(txt);
+  speechSynthesis.cancel();
+  const a = currentSet[currentIndex]; if(!a) return;
+  const rate = slow.checked ? 0.85 : 1.0;
+  const chosen = voices[voiceSel.selectedIndex] || voices[0];
+  a.body.forEach(txt=>{
+    const u = new SpeechSynthesisUtterance(txt);
     if(chosen) u.voice = chosen;
     u.lang = (chosen && chosen.lang) || 'fr-FR';
     u.rate = rate;
-    window.speechSynthesis.speak(u);
+    speechSynthesis.speak(u);
   });
 }
-function stopSpeech(){ window.speechSynthesis.cancel(); }
+function stopSpeech(){ speechSynthesis.cancel(); }
 function togglePlay(){
-  if(window.speechSynthesis.speaking && !window.speechSynthesis.paused){ window.speechSynthesis.pause(); }
-  else if(window.speechSynthesis.paused){ window.speechSynthesis.resume(); }
+  if(speechSynthesis.speaking && !speechSynthesis.paused){ speechSynthesis.pause(); }
+  else if(speechSynthesis.paused){ speechSynthesis.resume(); }
   else { speakCurrent(); }
 }
 
-/* ===== (G) Events ===== */
-showEn.addEventListener('change', function(){
-  Array.prototype.forEach.call(document.querySelectorAll('.en'), function(n){ n.style.display = showEn.checked ? 'block' : 'none'; });
-});
-[levelSelect, countSelect].forEach(function(sel){
-  sel.addEventListener('change', computeTodaySet);
-});
-btnPrev.addEventListener('click', function(){ if(currentIndex>0){ currentIndex--; renderCurrent(); } });
-btnNext.addEventListener('click', function(){ if(currentIndex<currentSet.length-1){ currentIndex++; renderCurrent(); } });
-btnReroll.addEventListener('click', function(){ rerollSalt++; computeTodaySet(); });
+/* ===== H) Events ===== */
+showEn.addEventListener('change', ()=> document.querySelectorAll('.en').forEach(n=> n.style.display = showEn.checked ? 'block' : 'none'));
+[levelSelect, countSelect].forEach(sel=> sel.addEventListener('change', computeTodaySet));
+btnPrev.addEventListener('click', ()=>{ if(currentIndex>0){ currentIndex--; renderCurrent(); } });
+btnNext.addEventListener('click', ()=>{ if(currentIndex<currentSet.length-1){ currentIndex++; renderCurrent(); } });
+btnReroll.addEventListener('click', ()=>{ rerollSalt++; computeTodaySet(); });
 btnPlay.addEventListener('click', togglePlay);
 btnStop.addEventListener('click', stopSpeech);
-window.addEventListener('keydown', function(e){
-  var tag = (e.target && e.target.tagName || '').toLowerCase();
-  if(tag==='input' || tag==='textarea' || tag==='select') return;
+window.addEventListener('keydown', (e)=>{
+  const t = (e.target && e.target.tagName || '').toLowerCase();
+  if(t==='input'||t==='textarea'||t==='select') return;
   if(e.key==='ArrowLeft'){ e.preventDefault(); btnPrev.click(); }
   if(e.key==='ArrowRight'){ e.preventDefault(); btnNext.click(); }
   if(e.code==='Space'){ e.preventDefault(); togglePlay(); }
 });
 
-/* ===== (H) Init ===== */
-if(document.readyState === 'loading'){
-  document.addEventListener('DOMContentLoaded', function(){ loadVoices(); computeTodaySet(); });
-}else{ loadVoices(); computeTodaySet(); }
+/* Swipe left/right on the card */
+(function(){
+  let x0=null, y0=null, t0=0;
+  card.addEventListener('touchstart', (e)=>{ const t=e.changedTouches[0]; x0=t.clientX; y0=t.clientY; t0=Date.now(); }, {passive:true});
+  card.addEventListener('touchend', (e)=>{
+    if(x0==null) return;
+    const t=e.changedTouches[0]; const dx=t.clientX - x0; const dy=t.clientY - y0; const dt=Date.now()-t0;
+    x0=y0=null;
+    if (Math.abs(dx) > 60 && Math.abs(dy) < 40 && dt < 600){
+      if (dx < 0 && currentIndex < currentSet.length-1) { currentIndex++; renderCurrent(); }
+      else if (dx > 0 && currentIndex > 0) { currentIndex--; renderCurrent(); }
+    }
+  }, {passive:true});
+})();
+
+/* ===== I) Init ===== */
+(async function init(){
+  await loadArticlesJSON();
+  loadVoices();
+  computeTodaySet();
+})();
 </script>
 </body>
 </html>
+
